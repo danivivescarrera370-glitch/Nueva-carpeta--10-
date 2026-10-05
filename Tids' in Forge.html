@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Social</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #F0F2F5; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        h1 span:nth-child(1), h1 span:nth-child(4) { color: #4285F4; }
+        h1 span:nth-child(2), h1 span:nth-child(6) { color: #EA4335; }
+        h1 span:nth-child(3) { color: #FBBC05; }
+        h1 span:nth-child(5) { color: #34A853; }
+        input, textarea, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: #4285F4; color: white; border: none; font-weight: bold; cursor: pointer; }
+        .hidden { display: none; }
+        .post { background: #f9f9f9; padding: 10px; margin-top: 10px; border-radius: 6px; text-align: left; border-left: 4px solid #34A853; }
+        .post img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 4px; margin-top: 8px; }
+        .file-label { display: block; background: #FBBC05; color: white; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9rem; margin: 4px 0; }
+        #img-preview { width: 100%; max-height: 100px; object-fit: cover; border-radius: 4px; display: none; margin: 8px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="login" class="box">
+        <h1><span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span></h1>
+        <p>Connect and share with your friends.</p>
+        <input type="text" id="user" placeholder="Email or phone" required>
+        <input type="password" placeholder="Password" required>
+        <button onclick="login()">Log In</button>
+    </div>
+
+    <!-- FEED -->
+    <div id="feed" class="box hidden">
+        <h2>Welcome, <span id="name"></span>!</h2>
+        <textarea id="msg" placeholder="What's on your mind?"></textarea>
+        
+        <label class="file-label">📷 Choose Image
+            <input type="file" id="img-input" accept="image/*" class="hidden" onchange="previewImg()">
+        </label>
+        <img id="img-preview" alt="Preview">
+
+        <button onclick="post()" style="background: #34A853;">Post</button>
+        <button onclick="logout()" style="background: #EA4335;">Log Out</button>
+        <div id="posts"></div>
+    </div>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        let selectedImgSrc = "";
+
+        function login() {
+            if (!$('user').value) return alert('Enter email');
+            $('name').innerText = $('user').value;
+            $('login').classList.add('hidden');
+            $('feed').classList.remove('hidden');
+        }
+
+        function logout() {
+            $('login').classList.remove('hidden');
+            $('feed').classList.add('hidden');
+            $('posts').innerHTML = '';
+            resetImg();
+        }
+
+        function previewImg() {
+            const file = $('img-input').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    selectedImgSrc = e.target.result;
+                    $('img-preview').src = selectedImgSrc;
+                    $('img-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function resetImg() {
+            selectedImgSrc = "";
+            $('img-input').value = "";
+            $('img-preview').style.display = 'none';
+            $('img-preview').src = "";
+        }
+
+        function post() {
+            if (!$('msg').value && !selectedImgSrc) return;
+            
+            const div = document.createElement('div');
+            div.className = 'post';
+            
+            if ($('msg').value) {
+                const p = document.createElement('p');
+                p.style.margin = '0';
+                p.innerText = $('msg').value;
+                div.appendChild(p);
+            }
+            
+            if (selectedImgSrc) {
+                const img = document.createElement('img');
+                img.src = selectedImgSrc;
+                div.appendChild(img);
+            }
+            
+            $('posts').prepend(div);
+            $('msg').value = '';
+            resetImg();
+        }
+    </script>
+</body>
+</html>
